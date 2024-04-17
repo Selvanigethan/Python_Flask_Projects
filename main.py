@@ -3,21 +3,25 @@ import random
 import requests
 import json
 from urllib.parse import urljoin
+from PIL import Image, ImageOps
+from io import BytesIO
+import os
 
 from Pokemon import Pokemon
 from PokemonResponseData import PokemonResponseData
 from PokemonVerifyData import PokemonVerifyData
 
-#from flask_restful import Api, Resource
+# from flask_restful import Api, Resource
 
 app = Flask(__name__)
 
-#api = Api(app)  # api = Flask(__name__)
+# api = Api(app)  # api = Flask(__name__)
 
 
-#class HelloWorld(Resource):
+# class HelloWorld(Resource):
 
 BASE_URL = "https://pokeapi.co/api/v2/pokemon/"
+IMAGE_FOLDER = 'images'
 answer_pokemon = Pokemon(None)
 
 
@@ -28,7 +32,6 @@ def get_text():
 
 @app.route('/api/getpokemons', methods=['GET'])
 def get_pokemons():
-    #return {"data": "Hello world"}
     first_random_number = random.randint(1, 50)
     second_random_number = random.randint(1, 50)
     third_random_number = random.randint(1, 50)
@@ -97,7 +100,8 @@ def build_pokemon_from_response(pokemon_id, response):
         artwork_url = json_data['sprites']['other']['official-artwork']['front_default']
         if artwork_url:
             pokemon.set_original_image_uri(urljoin(BASE_URL, artwork_url))
-
+            pokemon.set_silhouette_image_uri(convert_image_to_silhouette(pokemon.get_original_image_uri(),
+                                                                         pokemon.get_id()))
     return pokemon
 
 
@@ -122,7 +126,36 @@ def build_and_add_all_pokemons_list(pokemon_response_data, pokemon, second_rando
     pokemon_response_data.add_pokemon(pokemon)
 
 
-#api.add_resource(HelloWorld, "/helloworld")
+def convert_image_to_silhouette(url, pokemon_id):
+    create_image_folder()
+
+    image_url = url
+    response = requests.get(image_url)
+    if response.status_code != 200:
+        return jsonify({'error': 'Failed to download image'}), 400
+
+    image = Image.open(BytesIO(response.content))
+
+    silhouette_image = image.convert("L") #This part should be replaced by the image conversion to silhoutte
+
+    filename = 'silhouette_image' + str(pokemon_id) + '.png'
+    save_path = os.path.abspath(os.path.join(app.config['IMAGE_FOLDER'], filename))
+
+    # Save the silhouette image locally
+    silhouette_image.save(save_path)
+
+    # Return the path of the saved silhouette image
+    return save_path
+
+
+def create_image_folder():
+    global IMAGE_FOLDER
+    if not os.path.exists(IMAGE_FOLDER):
+        os.makedirs(IMAGE_FOLDER)
+    app.config['IMAGE_FOLDER'] = IMAGE_FOLDER
+
+
+# api.add_resource(HelloWorld, "/helloworld")
 
 if __name__ == "__main__":
     app.run(debug=True)
