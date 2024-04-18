@@ -1,7 +1,10 @@
 from flask import Flask
+from flask_cors import CORS
 from Service.PokemonService import PokemonService
 
+
 app = Flask(__name__)
+CORS(app, origins='http://localhost:3000', allow_headers=['Content-Type'])
 
 pokemon_service = PokemonService()
 

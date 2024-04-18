@@ -13,8 +13,8 @@ class PokemonResponseData:
     def set_all_pokemons(self, all_pokemons):
         self._all_pokemons = all_pokemons
 
-    def add_pokemon(self, pokemon):
-        self._all_pokemons.append(pokemon)
+    def add_pokemon(self, index, pokemon):
+        self._all_pokemons.insert(index, pokemon)
 
     def to_dict(self):
         return {

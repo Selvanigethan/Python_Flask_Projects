@@ -20,10 +20,10 @@ class PokemonService:
 
     def get_pokemons(self, app):
 
-        first_random_number = random.randint(1, 50)
-        second_random_number = random.randint(1, 50)
-        third_random_number = random.randint(1, 50)
-        fourth_random_number = random.randint(1, 50)
+        random_numbers = random.sample(range(1, 51), 4)
+
+        # Assign the random integers to four variables
+        first_random_number, second_random_number, third_random_number, fourth_random_number = random_numbers
 
         pokemon_id = first_random_number  #assigning the first random id to be our pokemon (correct one)
 
@@ -87,22 +87,26 @@ class PokemonService:
     def build_and_add_all_pokemons_list(self, pokemon_response_data, pokemon, second_random_number, third_random_number,
                                         fourth_random_number, app):
         pokemon_response = None
+        random_numbers = random.sample(range(4), 4)
+
+        # Assign the random integers to four variables
+        index_one, index_two, index_three, index_four = random_numbers #index_one doesn't mean the first element's in list. etc.
 
         # Add the initial pokemon to the list
-        pokemon_response_data.add_pokemon(pokemon)
+        pokemon_response_data.add_pokemon(index_one, pokemon)
 
         # Get data for the second random number
         pokemon_response = self.get_pokemon_data(second_random_number)
         pokemon = self.build_pokemon_from_response(second_random_number, pokemon_response, app)
-        pokemon_response_data.add_pokemon(pokemon)
+        pokemon_response_data.add_pokemon(index_two, pokemon)
 
         pokemon_response = self.get_pokemon_data(third_random_number)
         pokemon = self.build_pokemon_from_response(third_random_number, pokemon_response, app)
-        pokemon_response_data.add_pokemon(pokemon)
+        pokemon_response_data.add_pokemon(index_three, pokemon)
 
         pokemon_response = self.get_pokemon_data(fourth_random_number)
         pokemon = self.build_pokemon_from_response(fourth_random_number, pokemon_response, app)
-        pokemon_response_data.add_pokemon(pokemon)
+        pokemon_response_data.add_pokemon(index_four, pokemon)
 
     def create_http_request(self, pokemon_id):
         url = BASE_URL + str(pokemon_id)
